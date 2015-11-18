@@ -1,3 +1,6 @@
+# Checkpoints
+.ipynb_checkpoints/
+
 # Data
 *.zip
 *.csv
