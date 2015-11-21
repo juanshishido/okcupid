@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import print_function
+
 """
 This code implements a basic, Twitter-aware tokenizer.
 
@@ -47,7 +49,8 @@ __email__ = "See the author's website"
 ######################################################################
 
 import re
-import htmlentitydefs
+import html.entities as htmlentitydefs
+#import htmlentitydefs
 
 ######################################################################
 # The following strings are components in the regular expression
@@ -147,10 +150,10 @@ class Tokenizer:
         """        
         # Try to ensure unicode:
         try:
-            s = unicode(s)
+            s = str(s)
         except UnicodeDecodeError:
             s = str(s).encode('string_escape')
-            s = unicode(s)
+            s = str(s)
         # Fix HTML character entitites:
         s = self.__html2unicode(s)
         # Tokenize:
@@ -158,7 +161,7 @@ class Tokenizer:
         # Possible alter the case, but avoid changing emoticons like :D into :d:
         if not self.preserve_case:            
             words = map((lambda x : x if emoticon_re.search(x) else x.lower()), words)
-        return words
+        return [w for w in words]
 
     def tokenize_random_tweet(self):
         """
@@ -168,7 +171,7 @@ class Tokenizer:
         try:
             import twitter
         except ImportError:
-            print "Apologies. The random tweet functionality requires the Python twitter library: http://code.google.com/p/python-twitter/"
+            print("Apologies. The random tweet functionality requires the Python twitter library: http://code.google.com/p/python-twitter/")
         from random import shuffle
         api = twitter.Api()
         tweets = api.GetPublicTimeline()
@@ -205,19 +208,3 @@ class Tokenizer:
                 pass                    
             s = s.replace(amp, " and ")
         return s
-
-###############################################################################
-
-if __name__ == '__main__':
-    tok = Tokenizer(preserve_case=False)
-    samples = (
-        u"RT @ #happyfuncoding: this is a typical Twitter tweet :-)",
-        u"HTML entities &amp; other Web oddities can be an &aacute;cute <em class='grumpy'>pain</em> >:(",
-        u"It's perhaps noteworthy that phone numbers like +1 (800) 123-4567, (800) 123-4567, and 123-4567 are treated as words despite their whitespace."
-        )
-
-    for s in samples:
-        print "======================================================================"
-        print s
-        tokenized = tok.tokenize(s)
-        print "\n".join(tokenized)
