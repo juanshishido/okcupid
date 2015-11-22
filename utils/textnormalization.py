@@ -4,8 +4,6 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import regexp_tokenize
 
-from .happyfuntokenizing import Tokenizer
-
 
 def split_on_sentence(text):
     """Tokenize the text on sentences.
@@ -29,23 +27,25 @@ def remove_punctuation(sentences):
         return re_punc(sentences).strip()
 
 def split_on_word(text):
-    """Use happyfuntokenizing tokenizer.
+    """Use regular expression tokenizer.
+    Keep apostrophes.
     Returns a list of lists, one list for each sentence:
         [[word, word], [word, word, ..., word], ...].
     """
-    hft = Tokenizer()
     if type(text) is list:
-        return [hft.tokenize(sentence)
+        return [regexp_tokenize(sentence, pattern="\w+(?:[-']\w+)*")
                 for sentence in text]
     else:
-        return hft.tokenize(text)
+        return regexp_tokenize(text, pattern="\w+(?:[-']\w+)*")
 
 def normalize(tokenized_words):
-    """Removes stop words and lowercases text.
+    """Removes stop words, numbers, short words, and lowercases text.
     Returns a list of lists, one list for each sentence:
         [[word, word], [word, word, ..., word], ...].
     """
     stop_words = stopwords.words('english')
     return [[w.lower() for w in sent
-             if (w.lower() not in stop_words)]
+             if (w.lower() not in stop_words) and\
+             (not(w.lower().isnumeric())) and\
+             (len(w) > 2)]
             for sent in tokenized_words]
