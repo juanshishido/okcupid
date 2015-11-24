@@ -40,7 +40,7 @@ def split_on_word(text):
     else:
         return hft.tokenize(text)
 
-<<<<<<< HEAD
+
 def normalize(tokenized_words, remove_stopwords = True):
     """Removes stop words, numbers, short words, and lowercases text.
     Returns a list of lists, one list for each sentence:
@@ -57,14 +57,3 @@ def normalize(tokenized_words, remove_stopwords = True):
         return [[w.lower() for w in sent
                 if not(w.lower().isnumeric())]
                 for sent in tokenized_words]
-=======
-def normalize(tokenized_words):
-    """Removes stop words and lowercases text.
-    Returns a list of lists, one list for each sentence:
-        [[word, word], [word, word, ..., word], ...].
-    """
-    stop_words = stopwords.words('english')
-    return [[w.lower() for w in sent
-             if (w.lower() not in stop_words)]
-            for sent in tokenized_words]
->>>>>>> 8488bd76b9d328719ddeb5f78f584c32c6163696
