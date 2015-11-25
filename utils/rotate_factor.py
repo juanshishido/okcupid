@@ -10,7 +10,7 @@ def ortho_rotation(lam, method='varimax',gamma=None,
     if gamma == None:
         if (method == 'varimax'):
             gamma = 1.0
-        if (method == 'quartimax':
+        if (method == 'quartimax'):
             gamma = 0.0
 
     nrow, ncol = lam.shape
