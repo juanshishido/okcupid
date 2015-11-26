@@ -80,4 +80,4 @@ def hash_same(k):
         f = 'data/'+k
         return hash_get(f) == j[k]
     else:
-        raise ValueError('hash for {0} not in checksums.json'.format(k))
+        raise KeyError('hash for {0} not in checksums.json'.format(k))
