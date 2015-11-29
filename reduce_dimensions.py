@@ -36,27 +36,38 @@ def run_PCA(datamatrix, filename = 'data/pca_dict_50.pkl', n_components = 50):
 
     return pca, X_reduced
 
-def run_kmeans(X_reduced, range_n_clusters = [3,5,7]):
+def run_kmeans(X_reduced, filename = 'data/km_dict.pkl', range_n_clusters = [3,4, 5, 6, 7]):
     '''
     Run kmeans using k-means++ initialization for different cluster sizes
-    Print the silhouette score
+    Runs each kmean 50 times (using n_init argument) - takes clustering with lowest inertia
+    Calculates the silhouette score 10 times (with sampling) to get a stable estimate
     Takes in the PCA-reduced data and (optional) a range of clusters.
-    Return a dict with an entry per each cluster number
+    Save and return a dict with an entry per each cluster number
     '''
 
     km_dict = dict()
     for n_clusters in range_n_clusters:
 
         # Initialize the clusterer with n_clusters value 
-        kmeans = KMeans(n_clusters=n_clusters, init = 'k-means++')
-        km = kmeans.fit(X_reduced)
+        kmeans = KMeans(n_clusters=n_clusters, init = 'k-means++', n_init = 50) 
+        km = kmeans.fit(X_reduced) #will take one with lowest inertia (within-cluster sum-of-squares)
 
-        # Silhouette_score gives the average value for all samples.
-        # Gives a perspective into the density and separation of the clusters
-        silhouette_avg = metrics.silhouette_score(X_reduced, km.labels_, sample_size = 1000)
-        print("For n_clusters =", n_clusters,
-              "The average silhouette_score is :", silhouette_avg)
-        
-        km_dict[n_clusters] = km
+        #calculates score 10 times (to get more stable estimate)
+        silhouette_avg = []
+        i = 0
+        while i < 10:
+            try:
+                silhouette_avg.append(metrics.silhouette_score(X_reduced, km.labels_, sample_size = 1000))
+                i+=1
+            except:
+                continue
 
+        km_dict[n_clusters] = (km, np.mean(silhouette_avg), np.std(silhouette_avg))
+
+    #save file
+    
+    with open(filename, 'wb') as f:
+        pickle.dump(km_dict, f)
+   
+    
     return km_dict
