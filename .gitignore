@@ -2,7 +2,7 @@
 .DS_Store
 
 # Pickle
-datamatrix.pkl
+*.pkl
 
 # Checkpoints
 .ipynb_checkpoints/
