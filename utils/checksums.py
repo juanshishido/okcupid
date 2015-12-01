@@ -21,7 +21,6 @@ def hash_update(f, h, force_update=False):
     Returns
     -------
     None
-
     """
     hashes = 'data/hashes.json'
     kv = {f : h}
@@ -39,7 +38,6 @@ def hash_update(f, h, force_update=False):
     else:
         with open(hashes, 'w') as f:
             json.dump(kv, f, indent=4)
-        
 
 def hash_get(f):
     """Get the MD5 hash based on the rounded sum of the matrix values.
@@ -59,6 +57,8 @@ def hash_get(f):
         X = round(X.sum(), 8)
     elif f == 'data/pca_dict_50.pkl':
         X = np.round(X['X_reduced'][0].sum(), 8)
+    else:
+        break
     m = hashlib.md5()
     m.update(X)
     return m.hexdigest()
