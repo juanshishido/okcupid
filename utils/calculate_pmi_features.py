@@ -1,16 +1,10 @@
-
 # coding: utf-8
-
-# In[1]:
-
-get_ipython().magic(u'reset')
-
 
 # #Calculating PMI Features
 # The basic algorithm is as follows:  
 # 1. Read in the data as pandas data frame  
-# 2. Combine all the essays together, remove HTML tags, remove newline characters  
-# 3. Tokenize all the essays using the happyfuntokenizer  
+# 2. Combine all the essays together, remove HTML tags, remove newline characters
+# 3. Tokenize all the essays using the happyfuntokenizer
 # 4. Use the tokens to generate unigrams, bigrams, and trigrams. Stopwords are removed for bigrams and trigrams as well as unigrams. I felt that the bigrams and trigrams were more informative after this step. But we can add them back in if you'd like. These are stored in freqdists that come in handy for the PMI calculation.       
 # 5. Only keep unigrams that occur more than 3 times, bigrams with PMI > 4, and trigrams with PMI > 6. This starts building the vocabulary that will be used to vectorize the essay data.      
 # 6. Filter out unigrams, bigrams, and trigrams that are used by less than 1% of the users.   
@@ -69,8 +63,8 @@ def get_data():
     for text in essays:
         df[text] = df[text].apply(remove_nan)
     df['TotalEssays'] = df[essays].apply(lambda x: ' '.join(x), axis=1)
-    df['TotalEssays'] = df['TotalEssays'].apply(lambda x: BeautifulSoup(x).getText().replace('\n', ' '))
-                                            .apply(lambda x: re.sub('\s+', ' ', x).strip())
+    df['TotalEssays'] = df['TotalEssays'].apply(lambda x: BeautifulSoup(x).getText().replace('\n', ' '))\
+                                         .apply(lambda x: re.sub('\s+', ' ', x).strip())
     return df[df.TotalEssays.str.len() > 0]
 
 
@@ -235,9 +229,3 @@ data_matrix = create_data_matrix(main_df, vocab, 'datamatrix.pkl')
 # In[15]:
 
 np.isnan(data_matrix.todense()).sum()
-
-
-# In[ ]:
-
-
-

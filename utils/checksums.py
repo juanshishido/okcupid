@@ -58,7 +58,7 @@ def hash_get(f):
     elif f == 'data/pca_dict_50.pkl':
         X = np.round(X['X_reduced'][0].sum(), 8)
     else:
-        break
+        pass # TODO FIX THIS
     m = hashlib.md5()
     m.update(X)
     return m.hexdigest()
