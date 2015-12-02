@@ -5,7 +5,7 @@
 *.pdf
 
 # Pickle
-*.pkl
+datamatrix.pkl
 
 # Checkpoints
 .ipynb_checkpoints/
