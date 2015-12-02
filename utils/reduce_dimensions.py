@@ -2,12 +2,13 @@ import pickle
 from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from sklearn import metrics
-from utils import *
+#from utils import *
+from utils.hash import *
 import numpy as np
 import pandas as pd
 
 
-def run_PCA(datamatrix, filename = 'data/pca_dict_50.pkl', n_components = 50):
+def run_PCA(datamatrix, p, ppath, n_components = 50, force_update = False):
     '''
     Runs PCA with whitening on a data matrix of observations (rows) x features (columns)
     Saves out a pickle file of a dictionary with the fitted PCA and the reduced data
@@ -28,9 +29,11 @@ def run_PCA(datamatrix, filename = 'data/pca_dict_50.pkl', n_components = 50):
 
     #save file
     pca_dict = {'pca':pca, 'X_reduced':X_reduced}
-    with open(filename, 'wb') as f:
-        pickle.dump(data_matrix_dense, f)
-        
+    with open(ppath, 'wb') as f:
+        pickle.dump(pca_dict, f)
+
+    #add or update hash
+    hash_update(p, hash_get(p), force_update=force_update)
 
     print ('variance explained with {0} components: {1}'.format(n_components, pca.explained_variance_ratio_.sum()))
 

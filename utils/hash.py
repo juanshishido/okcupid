@@ -7,16 +7,18 @@ import numpy as np
 
 
 def hash_update(p, h, force_update=False):
-    """Add a new filename and hash to `hashes.json`
+    """For adding or updating keys (filenames) and values (hashes)
+    in `hashes.json`. If the key already exists, only update
+    if `force_update == True`. If it doesn't exist, add it.
 
     Parameters
     ----------
     p : str
-        The filename (without a path) for a particular pickled object
+        The pickled object filename
     h : str
         The hash for `p`
     force_update : bool
-        Whether to replace 
+        True to replace hash in `hashes.json`, False otherwise
 
     Returns
     -------
@@ -27,7 +29,6 @@ def hash_update(p, h, force_update=False):
     if os.path.isfile(hashes):
         with open(hashes) as f:
             data = json.load(f)
-
         if p in data.keys():
             if force_update:
                 data[p] = h
@@ -39,40 +40,42 @@ def hash_update(p, h, force_update=False):
         with open(hashes, 'w') as f:
             json.dump(kv, f, indent=4)
 
-def hash_get(ppath):
-    """Get the MD5 hash based on the rounded sum of the matrix values
-    for a specific pickled object.
+def hash_get(p):
+    """Get the MD5 hash for `p` based on the rounded sum of the
+    matrix values. Only include filename; path will be assumed.
+    Use control flow for handling differences in the pickled
+    object structures.
 
     Parameters
     ---------
-    ppath : str
-        The (relative path) filename for the particular object
+    p : str
+        The pickled object filename
 
     Returns
     -------
     m.hexdigest: str
         The digest containing only hexadecimal digits
     """
+    ppath = 'data/'+p
     X = pickle.load(open(ppath, 'rb'))
     if ppath == 'data/datamatrix.pkl':
         X = round(X.sum(), 8)
     elif ppath == 'data/pca_dict_50.pkl':
-        X = np.round(X['X_reduced'][0].sum(), 8)
+        X = np.round(np.abs(X['X_reduced']).sum(), 1)
     # elif ppath == 'data/km_dict.pkl':
         # pass
-    else:
-        raise ValueError('not a recognized .pkl file')
     m = hashlib.md5()
     m.update(X)
     return m.hexdigest()
     
 def hash_same(p):
-    """Get the hash and check it against what's in checksums.json.
+    """Get the hash associated with `p` and compare to what's in
+    `hashes.json`. Only include filename; path will be assumed.
 
     Parameters
     ----------
     p : str
-        The filename (without a path) for the particular object
+        The pickled object filename
 
     Returns
     -------
@@ -81,62 +84,81 @@ def hash_same(p):
     """
     j = json.load(open('data/hashes.json', 'r'))
     if p in j.keys():
-        f = 'data/'+p
-        return hash_get(f) == j[p]
+        return hash_get(p) == j[p]
     else:
         raise KeyError('hash for {0} not in checksums.json'.format(p))
 
-def script_updated(ppath, spath):
+def script_updated(p, s):
     """To determine whether the script has been updated since the
     pickled object was created. Assumes that a more recent timestamp
-    corresponds to a file whose changes we'll want to include.
+    corresponds to a file whose changes we'll want to include. Only
+    include filenames; paths will be assumed.
 
     Parameters
     ----------
-    ppath : str
-        The (relative path) filename for the pickled object
-    spath : str
-        The (relative path) filename for the script
+    p : str
+        The pickled object filename
+    s : str
+        The script filename
 
     Returns
     -------
     valid : bool
         True is script more recent than pickle, False otherwise
     """
-    pt = os.path.getmtime(ppath)
-    st = os.path.getmtime(spath)
+    pt = os.path.getmtime('data/'+p)
+    st = os.path.getmtime('utils/'+s)
     return st > pt
 
-def make(fn, pname, sname, kwargs):
-    """Wrapper function for determining whether to create or load
-    a pickled object
+def make(fn, s, kwargs):
+    """Wrapper function for returning a pickled object by either
+    creating or loading it.
 
     Parameters
     ----------
     fn : function
-        A function such as `run_PCA` that deals with a pickled object
-    pname : str
-        The filename (without a path) for the object associated with `fn`
-    sname : str
-        The filename (without a path) for the script associated with `fn`
+        A function such as `run_PCA` that creates a pickled object
+    s : str
+        The script filename
     kwargs : dict
         Keyword arguments of variable length
+        Must include the pickled object filename `p`
 
     Returns
     -------
     Pickled object by either creating or loading it
     """
-    ppath = 'data/'+pname
-    spath = 'utils/'+sname
+    assert 'p' in kwargs.keys(), '`kwargs` must include the pickled '+\
+        'object filename `p`'
+
+    p = kwargs['p']
+    ppath = 'data/'+p
+    pk = {'ppath' : ppath}
+    kwargs.update(pk)
+
     if os.path.isfile(ppath):
-        if hash_same(pname):
-            if script_updated(ppath, spath):
-                fn(pname, **kwargs)
-                pass
+        print('{0} exists'.format(p))
+        if 'force_update' in kwargs.keys():
+            print('user forcing update of {0}'.format(p))
+            return fn(**kwargs)
+        if hash_same(p):
+            print('the hash for {0} matches what\'s in hashes.json'.format(p))
+            print('checking whether the script has been updated...')
+            if script_updated(p, s):
+                print('it has; recreating {0}'.format(p))
+                fa = {'force_update' : True}
+                kwargs.update(fa)
+                return fn(**kwargs)
             else:
+                print('it hasn\'t; loading {0}'.format(p))
                 X = pickle.load(open(ppath, 'rb'))
                 return X
         else:
-            fn(pname, **kwargs)
+            print('the hash for {0} does not match what\'s in '+\
+                  'hashes.json; recreating it'.format(p))
+            fa = {'force_update' : True}
+            kwargs.update(fa)
+            return fn(**kwargs)
     else:
-        fn(pname, **kwargs)
+        print('{0} does not exist; creating it'.format(p))
+        return fn(**kwargs)
