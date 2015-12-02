@@ -8,10 +8,10 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import CountVectorizer
-
+from sklearn.feature_extraction.text import TfidfTransformer
 from utils.hash import *
 from utils import happyfuntokenizing
-
+#import happyfuntokenizing
 
 #Gets done in a reasonable time, joins all the essays together into one long text
 #Also gets rid of HTML tags using the BeautifulSoup Library
@@ -46,7 +46,7 @@ def generate_freqdists(df, stop_dict):
     words = [wordnet_lemmatizer.lemmatize(w.lower())
              for w in words
              if w not in string.punctuation and w.lower() not in stop_dict]
-    unigram_freq = nltk.FreqDist(words)
+	
     
     bigrams = nltk.ngrams(words, 2)
     bigram_freq = nltk.FreqDist(bigrams)
@@ -136,12 +136,12 @@ def create_data_matrix(df, vocab, filename, ppath, force_update=False):
     with open(ppath, 'wb') as f:
         pickle.dump(data_matrix_dense, f)
 
-    #add or update hash
-    hash_update(p, hash_get(p), force_update=force_update)
+    add or update hash
+    hash_update(filename, hash_get(filename), force_update=force_update)
         
     return data_matrix
 
-def run_PMI(p, ppath, force_update):
+def run_PMI(p, ppath, force_update=False):
     stop_dict = {}
     for w in stopwords.words('english'):
         stop_dict[w] = 1
@@ -151,5 +151,25 @@ def run_PMI(p, ppath, force_update):
     freq_dists = generate_freqdists(main_df, stop_dict)
     vocab = generate_vocab(freq_dists)
     vocab = filter_vocab(main_df, vocab, stop_dict)
-    data_matrix = create_data_matrix(main_df, vocab, p, force_update)
+    data_matrix = create_data_matrix(main_df, vocab, p, ppath, force_update)
     return data_matrix
+
+
+#Quick fix to get just the data matrix, count vectorizer matrix, and tfidf matrix
+if __name__ == '__main__':
+    df = get_data()
+    #df = tokenize_words(df)
+    tfidf_transformer = TfidfTransformer()
+    count_vec = CountVectorizer(stop_words='english', tokenizer=happyfuntokenizing.Tokenizer().tokenize, min_df=600)
+    print("transforming df")
+    counts = count_vec.fit_transform(df['TotalEssays'])
+    tfidf = tfidf_transformer.fit_transform(counts)
+    print("done transforming")
+    counts_dense = counts.todense()
+    tfidf_dense = tfidf.todense()
+    with open('countdatamatrix.pkl', 'wb') as f:
+        pickle.dump(counts_dense, f)
+    with open('tfidfdatamatrix.pkl', 'wb') as f:
+        pickle.dump(tfidf_dense, f)
+	
+
