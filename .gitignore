@@ -1,8 +1,11 @@
 # DS_Store
 .DS_Store
 
+# PDFs
+*.pdf
+
 # Pickle
-*.pkl
+datamatrix.pkl
 
 # Checkpoints
 .ipynb_checkpoints/
