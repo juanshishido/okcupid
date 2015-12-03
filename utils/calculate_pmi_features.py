@@ -136,7 +136,7 @@ def create_data_matrix(df, vocab, filename, ppath, force_update=False):
     with open(ppath, 'wb') as f:
         pickle.dump(data_matrix_dense, f)
 
-    add or update hash
+    #add or update hash
     hash_update(filename, hash_get(filename), force_update=force_update)
         
     return data_matrix
