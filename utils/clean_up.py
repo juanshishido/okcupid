@@ -31,7 +31,7 @@ def col_to_data_matrix(df, col_name):
 
     count_matrix = count_vect.fit_transform(df[col_name])
 
-    vocab = count_vect.vocabulary_
+    vocab = count_vect.get_feature_names()
     
     tfidf = TfidfTransformer()
     tfidf_matrix = tfidf.fit_transform(count_matrix)
