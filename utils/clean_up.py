@@ -30,8 +30,10 @@ def col_to_data_matrix(df, col_name):
                                  ngram_range=(1, 3), analyzer='word', min_df = 0.01)
 
     count_matrix = count_vect.fit_transform(df[col_name])
+
+    vocab = count_vect.vocabulary_
     
     tfidf = TfidfTransformer()
     tfidf_matrix = tfidf.fit_transform(count_matrix)
 
-    return count_matrix, tfidf_matrix
+    return count_matrix, tfidf_matrix, vocab
