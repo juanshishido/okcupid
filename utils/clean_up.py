@@ -1,7 +1,10 @@
 import re
 import string
+
+import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
+
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from utils import happyfuntokenizing
 
@@ -15,8 +18,7 @@ def clean_up(df, col_names, min_words = 5):
     for c in col_names:
         df[c] = df[c].replace(np.nan, '' , regex=True) \
                     .apply(lambda x: BeautifulSoup(x).getText().replace('\n', ' '))\
-                    .replace('\n', ' ')                  \
-                    .apply(lambda x: TAG_RE.sub(' ', x)) \
+                    .replace('\n', ' ')\
                     .apply(lambda x: re.sub('\s+', ' ', x).strip())
         token_count = df[c].str.split().str.len() 
         df = df[token_count > min_words] #drop rows where current essay has < min_words
