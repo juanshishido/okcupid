@@ -1,7 +1,10 @@
 import re
 import string
+
+import numpy as np
 import pandas as pd
 from bs4 import BeautifulSoup
+
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from utils import happyfuntokenizing
 
