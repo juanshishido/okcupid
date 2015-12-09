@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from utils import happyfuntokenizing
 
+from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 
 def clean_up(df, col_names, min_words = 5):
     '''
@@ -29,8 +30,9 @@ def col_to_data_matrix(df, col_name):
     Tokenize and vectorize for a single essay column (given by col_name)
     Returnss two matrices (countvect and tfidf) from that column
     '''
-    
-    count_vect = CountVectorizer(stop_words='english',
+    stop_punct = list(string.punctuation) + list(ENGLISH_STOP_WORDS) 
+
+    count_vect = CountVectorizer(stop_words = stop_punct,
                                  tokenizer=happyfuntokenizing.Tokenizer().tokenize,
                                  ngram_range=(1, 3), analyzer='word', min_df = 0.01)
 
