@@ -13,8 +13,11 @@ def clean_up(df, col_names, min_words = 5):
     Drops user if any essay has < min_words number of words (default = 5)
     '''
     for c in col_names:
-        df[c] = df[c].apply(lambda x: BeautifulSoup(x).getText().replace('\n', ' '))\
-                .apply(lambda x: re.sub('\s+', ' ', x).strip())
+        df[c] = df[c].replace(np.nan, '' , regex=True) \
+                    .apply(lambda x: BeautifulSoup(x).getText().replace('\n', ' '))\
+                    .replace('\n', ' ')                  \
+                    .apply(lambda x: TAG_RE.sub(' ', x)) \
+                    .apply(lambda x: re.sub('\s+', ' ', x).strip())
         token_count = df[c].str.split().str.len() 
         df = df[token_count > min_words] #drop rows where current essay has < min_words
     return df
@@ -31,7 +34,7 @@ def col_to_data_matrix(df, col_name):
 
     count_matrix = count_vect.fit_transform(df[col_name])
 
-    vocab = count_vect.vocabulary_
+    vocab = count_vect.get_feature_names()
     
     tfidf = TfidfTransformer()
     tfidf_matrix = tfidf.fit_transform(count_matrix)
