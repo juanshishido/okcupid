@@ -76,6 +76,14 @@ def language_categories(text):
     else:
 	    return text.count(',') + 1
 
+def language_categories_simple(language):
+    if language == 1:
+        return 'monolingual'
+    elif language == 2:
+        return 'bilingual'
+    else:
+        return 'multilingual'
+
 def pets_categories(text):
     yay_cats = False
     yay_dogs = False
