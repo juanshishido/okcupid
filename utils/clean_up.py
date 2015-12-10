@@ -23,6 +23,8 @@ def clean_up(df, col_names, min_words = 5):
                     .apply(lambda x: re.sub('\s+', ' ', x).strip())
         token_count = df[c].str.split().str.len() 
         df = df[token_count > min_words] #drop rows where current essay has < min_words
+
+        df.fillna('', inplace=True)
     return df
 
 def col_to_data_matrix(df, col_name):
