@@ -2,12 +2,14 @@
 Helper functions for reducing the number of levels in the demographic
 columms. These groupings *are* arbitrary.
 """
+import re
+
 
 def religion_categories(religion):
     if len(religion.split()) == 1:
         return 'neutral'
     elif len(religion.split()) > 1:
-        return ' '.join(religion.split()[1:])
+        return ' '.join(religion.split()[2:])
 
 def job_categories(job):
     if job in ['other', 'rather not say']:
@@ -119,6 +121,7 @@ def ethnicity_categories(text):
     return text
 
 def sign_categories(text):
+    text = re.sub('&rsquo;', '\'', text)
     if type(text) == float:
         return 'no answer'
     line = text.split(' ')
