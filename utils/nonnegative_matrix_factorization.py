@@ -73,8 +73,6 @@ def nmf_labels(tfidfmatrix, k):
     labels : np.ndarray
         An array of group assignments of length tfidfmatrix.shape[0] (users)
     """
-    nmf = NMF(n_components=k, random_state=42).fit(tfidfmatrix)
-    #W = nmf.components_
-    H = nmf.fit_transform(tfidfmatrix)
+    H = NMF(n_components=k, random_state=42).fit_transform(tfidfmatrix)
     labels = np.argmax(H, axis=1)
     return labels
