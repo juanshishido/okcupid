@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from utils import happyfuntokenizing
-
 from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 
 def clean_up(df, col_names, min_words = 5):
@@ -38,11 +37,45 @@ def col_to_data_matrix(df, col_name):
                                  tokenizer=happyfuntokenizing.Tokenizer().tokenize,
                                  ngram_range=(1, 3), analyzer='word', min_df = 0.01)
 
-    count_matrix = count_vect.fit_transform(df[col_name])
-
+    count_vect.fit(df[col_name])
     vocab = count_vect.get_feature_names()
+    trigrams = []
+    bigrams = []
+    unigrams = []
+    for v in vocab:
+        v_set = v.split()
+        if len(v_set) == 3:
+            trigrams.append(v)
+        elif len(v_set) == 2:
+            bigrams.append(v)
+        else:
+            unigrams.append(v)
+    vocab2 = trigrams + bigrams + unigrams
+    new_vocab = []
+    print()
+    for v in vocab2:
+        v_set = set(v.split())
+        if len(v_set) == 3:
+            new_vocab.append(v)
+            continue
+        add = True
+        for w in new_vocab:
+            w_set = set(w.split())
+            if v_set <= w_set:
+                add = False
+                break
+        if add:
+            new_vocab.append(v)
+    
+    count_vect = CountVectorizer(stop_words = stop_punct,
+                                 tokenizer=happyfuntokenizing.Tokenizer().tokenize,
+                                 ngram_range=(1, 3), vocabulary=new_vocab,
+                                 analyzer='word')
+    
+    count_matrix = count_vect.fit_transform(df[col_name])
     
     tfidf = TfidfTransformer()
     tfidf_matrix = tfidf.fit_transform(count_matrix)
 
-    return count_matrix, tfidf_matrix, vocab
+    return count_matrix, tfidf_matrix, new_vocab
+
