@@ -10,7 +10,7 @@ from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS
 from utils import happyfuntokenizing
 
 
-def clean_up(input_df, col_names, min_words = 5):
+def clean_up(input_df, col_names, min_words=5):
     '''
     Input : data frame and list of columns to clean up
     Returns: cleaned data frame (overwrites those columns)
@@ -34,12 +34,15 @@ def clean_up(input_df, col_names, min_words = 5):
     else:
         return tuple(dfs)
 
-def col_to_data_matrix(df, col_name):
+def col_to_data_matrix(df, col_name, remove_stopwords=False):
     '''
     Tokenize and vectorize for a single essay column (given by col_name)
     Returnss two matrices (countvect and tfidf) from that column
     '''
-    stop_punct = list(string.punctuation) + list(ENGLISH_STOP_WORDS) 
+    if remove_stopwords:
+        stop_punct = list(string.punctuation) + list(ENGLISH_STOP_WORDS) 
+    else:
+        stop_punct = list(string.punctuation)
 
     count_vect = CountVectorizer(stop_words = stop_punct,
                                  tokenizer=happyfuntokenizing.Tokenizer().tokenize,
@@ -86,4 +89,3 @@ def col_to_data_matrix(df, col_name):
     tfidf_matrix = tfidf.fit_transform(count_matrix)
 
     return count_matrix, tfidf_matrix, new_vocab
-
