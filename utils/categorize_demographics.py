@@ -5,6 +5,21 @@ columms. These groupings *are* arbitrary.
 import re
 
 
+def recategorize(df):
+    df['religion'] = df['religion'].apply(religion_categories)
+    df['job'] = df['job'].apply(job_categories)
+    df['drugs'] = df['drugs'].apply(drug_categories)
+    df['diet'] = df['diet'].apply(diet_categories)
+    df['body_type'] = df['body_type'].apply(body_categories)
+    df['drinks'] = df['drinks'].apply(drink_categories)
+    df['sign'] = df['sign'].apply(sign_categories)
+    df['ethnicity'] = df['ethnicity'].apply(ethnicity_categories)
+    df['pets'] = df['pets'].apply(pets_categories)
+    df['speaks'] = df['speaks'].apply(language_categories)
+    df['sex'] = df['sex'].apply(lambda x: str.upper(x))
+    df['gender_orientation'] = df[['sex','orientation']].apply(lambda x: ' '.join(x), axis=1)
+    return df
+
 def religion_categories(religion):
     if len(religion.split()) == 1:
         return 'neutral'
