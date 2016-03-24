@@ -34,7 +34,9 @@ def clean_up(input_df, col_names, min_words=5):
     else:
         return tuple(dfs)
 
-def col_to_data_matrix(df, col_name, remove_stopwords=False):
+def col_to_data_matrix(df, col_name, remove_stopwords=False,
+                       tokenizer=happyfuntokenizing.Tokenizer().tokenize,
+                       ngram_range=(1, 3), min_df=0.01):
     '''
     Tokenize and vectorize for a single essay column (given by col_name)
     Returnss two matrices (countvect and tfidf) from that column
@@ -44,9 +46,8 @@ def col_to_data_matrix(df, col_name, remove_stopwords=False):
     else:
         stop_punct = list(string.punctuation)
 
-    count_vect = CountVectorizer(stop_words = stop_punct,
-                                 tokenizer=happyfuntokenizing.Tokenizer().tokenize,
-                                 ngram_range=(1, 3), analyzer='word', min_df = 0.01)
+    count_vect = CountVectorizer(stop_words=stop_punct, tokenizer=tokenizer,
+                                 ngram_range=ngram_range, min_df=min_df)
 
     count_vect.fit(df[col_name])
     vocab = count_vect.get_feature_names()
@@ -78,10 +79,8 @@ def col_to_data_matrix(df, col_name, remove_stopwords=False):
         if add:
             new_vocab.append(v)
     
-    count_vect = CountVectorizer(stop_words = stop_punct,
-                                 tokenizer=happyfuntokenizing.Tokenizer().tokenize,
-                                 ngram_range=(1, 3), vocabulary=new_vocab,
-                                 analyzer='word')
+    count_vect = CountVectorizer(stop_words=stop_punct, tokenizer=tokenizer,
+                                 ngram_range=ngram_range, vocabulary=new_vocab)
     
     count_matrix = count_vect.fit_transform(df[col_name])
     
