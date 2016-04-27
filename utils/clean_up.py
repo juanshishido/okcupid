@@ -40,6 +40,7 @@ def col_to_data_matrix(df, col_name, remove_stopwords=False,
     '''
     Tokenize and vectorize for a single essay column (given by col_name)
     Returnss two matrices (countvect and tfidf) from that column
+    Creates and uses a vocabulary that removes redundancies (ie if a unigram is included in a trigram it is excluded)
     '''
     if remove_stopwords:
         stop_punct = list(string.punctuation) + list(ENGLISH_STOP_WORDS) 
@@ -54,7 +55,7 @@ def col_to_data_matrix(df, col_name, remove_stopwords=False,
     trigrams = []
     bigrams = []
     unigrams = []
-    for v in vocab:
+    for v in vocab: #sort in descending order (trigram, bigram, unigram)
         v_set = v.split()
         if len(v_set) == 3:
             trigrams.append(v)
@@ -67,20 +68,20 @@ def col_to_data_matrix(df, col_name, remove_stopwords=False,
     print()
     for v in vocab2:
         v_set = set(v.split())
-        if len(v_set) == 3:
+        if len(v_set) == 3: #first, create list of all trigrams
             new_vocab.append(v)
             continue
         add = True
-        for w in new_vocab:
+        for w in new_vocab: #for each bigram
             w_set = set(w.split())
-            if v_set <= w_set:
-                add = False
+            if v_set <= w_set: #check if bigram is included in the trigrams
+                add = False #if so, go to next word
                 break
         if add:
-            new_vocab.append(v)
+            new_vocab.append(v) #if bigram is not in trigram, add to list
     
     count_vect = CountVectorizer(stop_words=stop_punct, tokenizer=tokenizer,
-                                 ngram_range=ngram_range, vocabulary=new_vocab)
+                                 ngram_range=ngram_range, vocabulary=new_vocab) #count vector with new, cleaned vocab
     
     count_matrix = count_vect.fit_transform(df[col_name])
     
