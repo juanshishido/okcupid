@@ -43,5 +43,5 @@ def log_odds_ratio(counts, feature_names=None, symmetric_alpha=1, use_variance=F
         diff = diff / np.sqrt((1 / (counts[0] + symmetric_alpha)) +
                               (1 / (counts[1] + symmetric_alpha)))
     log_odds = pd.DataFrame(diff, columns=['log_odds_ratio'])
-    log_odds['features'] = feature_names
+    log_odds.index = feature_names
     return log_odds
