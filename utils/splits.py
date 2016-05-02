@@ -105,3 +105,27 @@ def subset_df(df, col, vals):
     df = df.copy()
     subset = df[df[col].isin(vals)]
     return subset
+
+def group_pct(df, demographic):
+    """Calculate the percentage of users in each `demographic` level
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Where applicable, this should be a subset of the original DataFrame and 
+        should include a `group` column corresponding to the NMF groupings
+    demographic : str
+        Valid column name
+
+    Returns
+    -------
+    by_dg : pd.DataFrame
+        Including `demographic` levels and `group` percentages
+    """
+    df = df.copy()
+    by_dg = pd.DataFrame({'count' :
+                          df.groupby([demographic, 'group'])['group'].count()}).reset_index()
+    by_d = by_dg.groupby(demographic, as_index=False)['count'].sum()
+    by_dg = pd.merge(by_dg, by_d, on=demographic)
+    by_dg['pct'] = by_dg.count_x / by_dg.count_y
+    return by_dg
