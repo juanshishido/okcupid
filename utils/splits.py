@@ -84,3 +84,24 @@ def wf(df, n):
     wf_top = list(zip(top.index, top[col]))
     wf_bottom = list(zip(bottom.index, bottom[col] * -1))
     return wf_top, wf_bottom
+
+def subset_df(df, col, vals):
+    """Return a subset of `df` based on particular `vals` for `col`
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input DataFrame
+    col : str
+        Valid column name
+    vals : list
+        Values to subset on
+
+    Returns
+    -------
+    subset : pd.DataFrame
+        The rows in `df` with values in `val` for `col`
+    """
+    df = df.copy()
+    subset = df[df[col].isin(vals)]
+    return subset
