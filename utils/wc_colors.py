@@ -48,3 +48,23 @@ def yellow(word, font_size, position, orientation, random_state=None, **kwargs):
 def cyan(word, font_size, position, orientation, random_state=None, **kwargs):
     RGB = tuple([round(c * 255) for c in mpl.colors.colorConverter.to_rgb('#64ffda')])
     return 'rgb'+str(RGB)
+
+def orange_light(word, font_size, position, orientation, random_state=None, **kwargs):
+    RGB = tuple([round(c * 255) for c in mpl.colors.colorConverter.to_rgb('#FFA500')])
+    return 'rgb'+str(RGB)
+
+def blue_light(word, font_size, position, orientation, random_state=None, **kwargs):
+    RGB = tuple([round(c * 255) for c in mpl.colors.colorConverter.to_rgb('#56B4E9')])
+    return 'rgb'+str(RGB)
+
+def pink(word, font_size, position, orientation, random_state=None, **kwargs):
+    RGB = tuple([round(c * 255) for c in mpl.colors.colorConverter.to_rgb('#CC79A7')])
+    return 'rgb'+str(RGB)
+
+def green_light(word, font_size, position, orientation, random_state=None, **kwargs):
+    RGB = tuple([round(c * 255) for c in mpl.colors.colorConverter.to_rgb('#009E73')])
+    return 'rgb'+str(RGB)
+
+def red_light(word, font_size, position, orientation, random_state=None, **kwargs):
+    RGB = tuple([round(c * 255) for c in mpl.colors.colorConverter.to_rgb('#ff4d4d')])
+    return 'rgb'+str(RGB)

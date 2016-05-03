@@ -31,7 +31,7 @@ def wcloud(wf, color, save_as=None):
     if save_as:
         plt.savefig(save_as, dpi=300, transparent=True)
 
-def lollipop(df, demographic):
+def lollipop(df, demographic, colors):
     """Create the lollipop plots for the percentage of users in each NMF group
 
     Parameters
@@ -40,6 +40,8 @@ def lollipop(df, demographic):
         Should be created using `group_pct()` in `utils/splits.py`
     demographic : str
         Valid column name
+    colors : list
+        Valid Matplotlib colors codes or names (e.g., hex)
 
     Returns
     -------
@@ -47,8 +49,10 @@ def lollipop(df, demographic):
     """
     df = df.copy()
     # styling
-    colors = ['#348ABD', '#A60628', '#7A68A6', '#467821', '#D55E00', '#CC79A7',
-              '#56B4E9', '#009E73', '#F0E442', '#0072B2', '#A500FF', '#FFA500']
+    if not colors:
+        colors = ['#348ABD', '#A60628', '#7A68A6', '#467821',
+                  '#D55E00', '#CC79A7', '#56B4E9', '#009E73',
+                  '#F0E442', '#0072B2', '#A500FF', '#FFA500']
     sns.set_style("dark")
     fs = 28
     weight = 'bold'
