@@ -23,7 +23,6 @@ def clean_up(input_df, col_names, min_words=5):
         df = input_df.copy()
         df[c] = df[c].replace(np.nan, '' , regex=True) \
                      .apply(lambda x: BeautifulSoup(x).getText().replace('\n', ' '))\
-                     .replace('\n', ' ')\
                      .apply(lambda x: re.sub(r"(?:\@|https?\://)\S+", "", x))\
                      .apply(lambda x: re.sub('\s+', ' ', x).strip())
         token_count = df[c].str.split().str.len() 
