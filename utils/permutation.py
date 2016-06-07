@@ -61,5 +61,5 @@ def permute(a, b, comparison='predictions', permutations=10000):
     for _ in range(permutations):
         np.random.shuffle(c)
         v.append(compare(a, c))
-    p_value = (np.array(v) >= baseline).sum() / permutations
+    p_value = (np.abs(np.array(v)) >= np.abs(baseline)).sum() / permutations
     return p_value
