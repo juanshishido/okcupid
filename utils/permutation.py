@@ -2,39 +2,33 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 
 
-def permute(y_true, y_pred, permutations=10000):
-    """Permutation-based p-value for assessing classifier performance
+def permute(a, b, permutations=10000):
+    """Estimate of the permutation-based p-value
 
     Parameters
     ----------
-    y_true : np.ndarray
-        Ground truth (correct) labels
-    y_pred : np.ndarray
-        Predicted labels, as returned by a classifier
+    a : np.ndarray
+        Data for one class or
+        ground truth (correct) labels
+    b : np.ndarray
+        Data for another class or
+        predicted labels, as returned by a classifier
     permutations : int, optional
-        Number of times to permute `y_pred`
+        Number of permutations
 
     Returns
     -------
     p_value : float
-        Permutation-based
-
-    Notes
-    -----
-    Using Scikit-Learn's `y_true` and `y_pred` naming conventions
-    and descriptions
-
-    The p-value represents the fraction of times where the accuracy
-    of the shuffled `y_pred` labels and `y_true` labels was greater
-    than or equal to the baseline accuracy, as predicted by the classifier
+        The proportion of times a value as extreme
+        as the observed estimate is seen
     """
-    assert isinstance(y_true, np.ndarray) and isinstance(y_pred, np.ndarray)
+    assert isinstance(a, np.ndarray) and isinstance(b, np.ndarray)
     np.random.seed(42)
-    y_pred = y_pred.copy()
-    baseline = accuracy_score(y_true, y_pred)
+    b = b.copy()
+    baseline = accuracy_score(a, b)
     v = []
     for _ in range(permutations):
-        np.random.shuffle(y_pred)
-        v.append(accuracy_score(y_true, y_pred))
+        np.random.shuffle(b)
+        v.append(accuracy_score(a, b))
     p_value = (np.array(v) >= baseline).sum() / permutations
     return p_value
