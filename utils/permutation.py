@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import ttest_ind
 from sklearn.metrics import accuracy_score
 
 
@@ -20,7 +21,7 @@ def _diff_means(m, arr):
     """
     return np.mean(arr[:m]) - np.mean(arr[m:])
 
-def permute(a, b, comparison='predictions', permutations=10000):
+def _permute(a, b, comparison='predictions', permutations=10000):
     """Estimate of the permutation-based p-value
 
     Parameters
@@ -63,3 +64,15 @@ def permute(a, b, comparison='predictions', permutations=10000):
         v.append(compare(a, c))
     p_value = (np.abs(np.array(v)) >= np.abs(baseline)).sum() / permutations
     return p_value
+
+def print_pvalues(a, b):
+    """Wrapper function for printing meand and p-values
+    both permutation-based and classical
+    """
+    rnd = lambda x: np.round(x, 8)
+    permutation = _permute(a, b, 'means')
+    classical = ttest_ind(a, b, equal_var=False)[1]
+    print("[means] 'a':", rnd(a.mean()), "'b':", rnd(b.mean()))
+    print("p-values:")
+    print("  [permutation]:", rnd(permutation))
+    print("  [classical]:  ", rnd(classical))
