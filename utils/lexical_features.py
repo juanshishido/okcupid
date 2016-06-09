@@ -134,3 +134,18 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None):
                   str(n) + ")")
         arrs.append(arr)
     return tuple(arrs)
+
+def load_words(path):
+    """To load profane and slang words
+
+    Parameters
+    ----------
+    path : str
+        Relative or absolute filepath
+
+    Returns
+    -------
+    list
+    """
+    with open(path, 'r') as f:
+        return list(set([w.rstrip() for w in f.readlines()]))
