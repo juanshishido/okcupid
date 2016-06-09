@@ -59,7 +59,7 @@ def pos_normalize(df):
     -------
     pd.DataFrame
     """
-    assert isinstance(df, pd.DataFrame):
+    assert isinstance(df, pd.DataFrame)
     return (df.T / df.sum(axis=1)).T
 
 def _levels(df, demo, d_levels=None):
