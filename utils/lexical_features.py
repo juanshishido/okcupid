@@ -25,7 +25,7 @@ def _pos_freq(doc):
             pos[token.pos_] += 1
     return pos
 
-def pos_df(corpus, normalize=True):
+def pos_df(corpus):
     """Create a DataFrame of part of speech
     frequencies for a corpus of documents
     
@@ -33,8 +33,6 @@ def pos_df(corpus, normalize=True):
     ----------
     corpus : array-like
         A collection of documents
-    normalize : bool (default True)
-        Whether to normalize by token counts
         
     Returns
     -------
@@ -47,9 +45,22 @@ def pos_df(corpus, normalize=True):
         pos_dfs.append(frequencies)
     df = pd.concat(pos_dfs, ignore_index=True)
     df.fillna(0.0, inplace=True)
-    if normalize:
-        df = (df.T / df.sum(axis=1)).T
     return df
+
+def pos_normalize(df):
+    """Normalize (row-wise) part-of-speech frequencies
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        `pos_df()` DataFrame
+
+    Returns
+    -------
+    pd.DataFrame
+    """
+    assert isinstance(df, pd.DataFrame):
+    return (df.T / df.sum(axis=1)).T
 
 def _levels(df, demo, d_levels=None):
     """The demographic levels to iterate over
