@@ -190,4 +190,5 @@ def contains(words, corpus):
         Binary representation
     """
     n_words = _contains_n(words, corpus)
-    return n_words[n_words > 0] = 1
+    n_words[n_words > 0] = 1
+    return n_words
