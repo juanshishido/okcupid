@@ -1,7 +1,12 @@
 from collections import defaultdict
+import re
+from string import punctuation
 
 import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
 from spacy.en import English
+
+from utils.spacy_tokenizer import spacy_tokenize
 
 
 nlp = English(tagger=True, entity=False)
@@ -149,3 +154,40 @@ def load_words(path):
     """
     with open(path, 'r') as f:
         return list(set([w.rstrip() for w in f.readlines()]))
+
+def _contains_n(words, corpus):
+    """Count the number of times a document contains particular words
+
+    Parameters
+    ----------
+    words : list
+        Words to check for
+    corpus : array-like
+        A collection of documents
+
+    Returns
+    -------
+    np.ndarray
+    """
+    assert isinstance(words, list) and isinstance(corpus, (list, pd.Series))
+    cv = CountVectorizer(tokenizer=spacy_tokenize, vocabulary=words)
+    X = cv.fit_transform(corpus)
+    return X.toarray().sum(axis=1)
+
+def contains(words, corpus):
+    """Determine whether a document contains particular words
+
+    Parameters
+    ----------
+    words : list
+        Words to check for
+    corpus : array-like
+        A collection of documents
+
+    Returns
+    -------
+    n_words : np.ndarray
+        Binary representation
+    """
+    n_words = _contains_n(words, corpus)
+    return n_words[n_words > 0] = 1
