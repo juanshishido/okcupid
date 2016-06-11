@@ -6,6 +6,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from spacy.en import English
 
+from utils.permutation import print_pvalues
 from utils.spacy_tokenizer import spacy_tokenize
 
 
@@ -94,7 +95,8 @@ def _levels(demographics, d_levels=None, print_levels=False):
         print('Levels (in order):', levels, end='\n\n')
     return levels
 
-def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None, print_levels=False):
+def _arrs_pos(df_orig, df_pos, demographic, pos,
+              d_levels=None, print_levels=False):
     """Individual part-of-speech
     arrays for a particular demographic
     
@@ -102,7 +104,7 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None, print_levels=Fals
     ----------
     df_orig : pd.DataFrame
         The DataFrame from which `df_pos` was created
-    pos_df : pd.DataFrame
+    df_pos : pd.DataFrame
         The part-of-speech DataFrame
     demographic : str
         A valid demographic-data column in `df_orig`
@@ -112,6 +114,7 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None, print_levels=Fals
     d_levels : list, default None
         The specific demographic levels desired
     print_levels : bool, default False
+        Whether to print the demographic levels
     
     Returns
     -------
@@ -136,6 +139,39 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None, print_levels=Fals
                   str(n) + ")")
         arrs.append(arr)
     return tuple(arrs)
+
+def pos_by_split(df_orig, df_pos, demographic, pos=None,
+                 d_levels=None, print_levels=False):
+    """Wrapper for handling multiple parts-of-speech with `_arrs_pos()`
+
+    Parameters
+    ----------
+    df_orig : pd.DataFrame
+        The DataFrame from which `df_pos` was created
+    df_pos : pd.DataFrame
+        The part-of-speech DataFrame
+    demographic : str
+        A valid demographic-data column in `df_orig`
+    pos : list, default None
+        Parts-of-speech to compare
+    d_levels : list, default None
+        The specific demographic levels desired
+    print_levels : bool, default False
+        Whether to print the demographic levels
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    The number of unique values in `demographic` must be two
+    """
+    for p in pos:
+        a, b = _arrs_pos(df_orig, df_pos, demographic, p, d_levels, print_levels)
+        print(p)
+        print_pvalues(a, b)
+        print()
 
 def load_words(path):
     """To load profane and slang words
