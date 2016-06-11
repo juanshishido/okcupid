@@ -67,27 +67,25 @@ def pos_normalize(df):
     assert isinstance(df, pd.DataFrame)
     return (df.T / df.sum(axis=1)).T
 
-def _levels(df, demo, d_levels=None, print_levels=True):
+def _levels(demographics, d_levels=None, print_levels=False):
     """The demographic levels to iterate over
     
     Parameters
     ----------
-    df : pd.DataFrame
-        The DataFrame with the demographic data
-    demo : str
-        A valid demographic-data column in `df`
-    d_levels : list of None (default)
+    demographics : pd.Series
+        Demographic labels
+    d_levels : list, default None
         The specific demographic levels desired
-    print_levels : bool (default True)
+    print_levels : bool, default False
         Whether to print the demographic levels
-
     
     Returns
     -------
-    levels : list
-        The unique (sorted) levels in `df[demo]`
+    levels : iterable
+        The unique (sorted) levels in `demographics`
     """
-    levels = df[demo].unique()
+    assert isinstance(demographics, pd.Series)
+    levels = demographics.unique()
     if d_levels:
         assert set(d_levels).issubset(levels)
         levels = d_levels
@@ -96,7 +94,7 @@ def _levels(df, demo, d_levels=None, print_levels=True):
         print('Levels (in order):', levels, end='\n\n')
     return levels
 
-def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None):
+def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None, print_levels=False):
     """Individual part-of-speech
     arrays for a particular demographic
     
@@ -111,8 +109,9 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None):
     pos : str
         A column in `df_pos` corresponding
         to a part of speech
-    d_levels : list or None (default)
+    d_levels : list, default None
         The specific demographic levels desired
+    print_levels : bool, default False
     
     Returns
     -------
@@ -126,7 +125,7 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None):
             pos in df_pos.columns)
     df_pos = df_pos.copy() # so we don't modify it
     df_pos[demographic] = df_orig[demographic].values
-    levels = _levels(df_orig, demographic, d_levels)
+    levels = _levels(df_orig[demographic], d_levels, print_levels)
     arrs = []
     for d in levels:
         arr = df_pos[df_pos[demographic] == d][pos].values
