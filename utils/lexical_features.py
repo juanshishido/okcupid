@@ -67,19 +67,20 @@ def pos_normalize(df):
     assert isinstance(df, pd.DataFrame)
     return (df.T / df.sum(axis=1)).T
 
-def _levels(df, demo, d_levels=None):
+def _levels(df, demo, d_levels=None, print_levels=True):
     """The demographic levels to iterate over
     
     Parameters
     ----------
     df : pd.DataFrame
         The DataFrame with the demographic data
-    
     demo : str
         A valid demographic-data column in `df`
-    
     d_levels : list of None (default)
         The specific demographic levels desired
+    print_levels : bool (default True)
+        Whether to print the demographic levels
+
     
     Returns
     -------
@@ -91,7 +92,8 @@ def _levels(df, demo, d_levels=None):
         assert set(d_levels).issubset(levels)
         levels = d_levels
     levels.sort()
-    print('Levels (in order):', levels, end='\n\n')
+    if print_levels:
+        print('Levels (in order):', levels, end='\n\n')
     return levels
 
 def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None):
@@ -102,17 +104,13 @@ def arrs_pos(df_orig, df_pos, demographic, pos, d_levels=None):
     ----------
     df_orig : pd.DataFrame
         The DataFrame from which `df_pos` was created
-    
     pos_df : pd.DataFrame
         The part-of-speech DataFrame
-    
     demographic : str
         A valid demographic-data column in `df_orig`
-    
     pos : str
         A column in `df_pos` corresponding
         to a part of speech
-    
     d_levels : list or None (default)
         The specific demographic levels desired
     
