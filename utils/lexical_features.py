@@ -137,8 +137,8 @@ def pos_by_split(df_orig, df_pos, demographic, pos=None,
     assert (isinstance(df_orig, pd.DataFrame) and
             isinstance(df_pos, pd.DataFrame))
     assert df_orig.shape[0] == df_pos.shape[0]
-    assert (demographic in df_orig.columns and
-            pos in df_pos.columns)
+    assert demographic in df_orig.columns
+    assert set(pos).issubset(df_pos.columns)
     for p in pos:
         a, b = _arrs_pos(df_orig, df_pos, demographic, p, d_levels, print_levels)
         print(p)

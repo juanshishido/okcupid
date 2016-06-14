@@ -47,6 +47,7 @@ def _permute(a, b, comparison='predictions', permutations=10000):
     -----
     This calculates the two-tailed p-value
     """
+    assert comparison in ('predictions', 'means')
     np.random.seed(42)
     if comparison == 'predictions':
         c = b.copy()
@@ -81,7 +82,6 @@ def print_pvalues(a, b):
     None
     """
     assert isinstance(a, np.ndarray) and isinstance(b, np.ndarray)
-    assert comparison in ('predictions', 'means')
     rnd = lambda x: np.round(x, 8)
     permutation = _permute(a, b, 'means')
     classical = ttest_ind(a, b, equal_var=False)[1]
