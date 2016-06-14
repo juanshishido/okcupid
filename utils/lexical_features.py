@@ -93,11 +93,6 @@ def _arrs_pos(df_orig, df_pos, demographic, pos,
     arrs : tuple of np.arrays
         The corresponding `pos` values for each `demographic`
     """
-    assert (isinstance(df_orig, pd.DataFrame) and
-            isinstance(df_pos, pd.DataFrame))
-    assert df_orig.shape[0] == df_pos.shape[0]
-    assert (demographic in df_orig.columns and
-            pos in df_pos.columns)
     df_pos = df_pos.copy() # so we don't modify it
     df_pos[demographic] = df_orig[demographic].values
     levels = _levels(df_orig[demographic], d_levels, print_levels)
@@ -139,6 +134,11 @@ def pos_by_split(df_orig, df_pos, demographic, pos=None,
     -----
     The number of unique values in `demographic` must be two
     """
+    assert (isinstance(df_orig, pd.DataFrame) and
+            isinstance(df_pos, pd.DataFrame))
+    assert df_orig.shape[0] == df_pos.shape[0]
+    assert (demographic in df_orig.columns and
+            pos in df_pos.columns)
     for p in pos:
         a, b = _arrs_pos(df_orig, df_pos, demographic, p, d_levels, print_levels)
         print(p)
@@ -157,6 +157,7 @@ def load_words(path):
     -------
     list
     """
+    assert isinstance(path, str)
     with open(path, 'r') as f:
         return list(set([w.rstrip() for w in f.readlines()]))
 
@@ -175,7 +176,6 @@ def _contains_n(words, corpus):
     np.ndarray
         Number of tokens by document
     """
-    assert isinstance(words, list)
     X = _multinomial(corpus, words)
     return X.toarray().sum(axis=1)
 
@@ -194,6 +194,8 @@ def contains(words, corpus):
     n_words : np.ndarray
         Binary representation
     """
+    assert isinstance(words, list)
+    assert isinstance(corpus, (list, pd.Series))
     n_words = _contains_n(words, corpus)
     n_words[n_words > 0] = 1
     return n_words

@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from scipy.sparse.csr import csr_matrix
 
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -41,6 +42,8 @@ def most_like(demographics, doc, demo):
     ct : pd.DataFrame
         Normalized (row-wise) demographic level counts
     """
+    assert isinstance(demographics, pd.Series)
+    assert isinstance(doc, csr_matrix) and isinstance(demo, csr_matrix)
     d_labels = _levels_dict(demographics)
     scores = cosine_similarity(doc, demo)
     df = pd.DataFrame(np.argmax(scores, axis=1), columns=['which'])

@@ -24,5 +24,6 @@ def spacy_tokenize(text):
     Source of above quote:
         https://nicschrading.com/project/Intro-to-NLP-with-spaCy/
     """
+    assert isinstance(text, str)
     tokens = nlp(text)
     return [str(t) for t in tokens if str(t) not in string.punctuation]

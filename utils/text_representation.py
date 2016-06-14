@@ -23,7 +23,6 @@ def _levels(demographics, d_levels=None, print_levels=False):
     levels : iterable
         The unique (sorted) levels in `demographics`
     """
-    assert isinstance(demographics, pd.Series)
     levels = demographics.unique()
     if d_levels:
         assert set(d_levels).issubset(levels)

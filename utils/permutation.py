@@ -47,8 +47,6 @@ def _permute(a, b, comparison='predictions', permutations=10000):
     -----
     This calculates the two-tailed p-value
     """
-    assert isinstance(a, np.ndarray) and isinstance(b, np.ndarray)
-    assert comparison in ('predictions', 'means')
     np.random.seed(42)
     if comparison == 'predictions':
         c = b.copy()
@@ -68,7 +66,22 @@ def _permute(a, b, comparison='predictions', permutations=10000):
 def print_pvalues(a, b):
     """Wrapper function for printing meand and p-values
     both permutation-based and classical
+
+    Parameters
+    ----------
+    a : np.ndarray
+        Data for one class or
+        ground truth (correct) labels
+    b : np.ndarray
+        Data for another class or
+        predicted labels, as returned by a classifier
+
+    Returns
+    -------
+    None
     """
+    assert isinstance(a, np.ndarray) and isinstance(b, np.ndarray)
+    assert comparison in ('predictions', 'means')
     rnd = lambda x: np.round(x, 8)
     permutation = _permute(a, b, 'means')
     classical = ttest_ind(a, b, equal_var=False)[1]
