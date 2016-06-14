@@ -33,6 +33,23 @@ def _levels(demographics, d_levels=None, print_levels=False):
         print('Levels (in order):', levels, end='\n\n')
     return levels
 
+def corpus_vocab(corpus):
+    """Corpus vocabulary (tokens) based on spaCy tokenizer
+
+    Parameters
+    ----------
+    corpus : array-like
+        A collection of documents
+
+    Returns
+    -------
+    list
+    """
+    assert isinstance(corpus, (list, pd.Series))
+    cv = CountVectorizer(tokenizer=spacy_tokenize)
+    _ = cv.fit_transform(corpus)
+    return cv.get_feature_names()
+
 def _multinomial(corpus, vocabulary=None):
     """Tokens counts by document using the spaCy tokenizer
 
@@ -70,7 +87,7 @@ def _tfidf(X):
     X_ = tt.fit_transform(X)
     return X_
 
-def tfidf_matrices(corpus, demographics):
+def tfidf_matrices(corpus, demographics, vocabulary=None):
     """For creating tfidf matrices of:
         * documents
         * demographic levels
@@ -81,6 +98,8 @@ def tfidf_matrices(corpus, demographics):
         A collection of documents
     demographics : pd.Series
         Demographic labels
+    vocabulary : list, default None
+        Tokens to consider
 
     Returns
     -------
@@ -98,7 +117,7 @@ def tfidf_matrices(corpus, demographics):
     assert (isinstance(corpus, pd.Series) and
             isinstance(demographics, pd.Series))
     assert corpus.shape[0] == demographics.shape[0]
-    doc_level = _multinomial(corpus)
+    doc_level = _multinomial(corpus, vocabulary=vocabulary)
     levels = _levels(demographics)
     splits = []
     for level in levels:
