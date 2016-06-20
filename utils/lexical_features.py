@@ -11,23 +11,83 @@ from utils.text_representation import _levels, _multinomial
 
 nlp = English(tagger=True, entity=False)
 
+def tagger(doc):
+    """For tagging a document
+    Yields a (token, part-of-speech) tag tuple
+
+    Parameters
+    ----------
+    doc : str
+        A document with tokens to tag
+
+    Yields
+    ------
+    tuple
+        (token, tag)
+    """
+    text = nlp(doc)
+    for sent in text.sents:
+        for token in sent:
+            yield (str(token), str(token.pos_))
+
+def tag_corpus(corpus):
+    """For tagging corpus document tokens
+
+    Parameters
+    ----------
+    corpus : array-like
+        A collection of documents
+
+    Returns
+    -------
+    tagged : list
+        (token, tag) tuples
+    """
+    assert isinstance(corpus, (list, pd.Series))
+    tagged = []
+    for doc in corpus:
+        tagged.extend(tagger(doc))
+    return tagged
+
+def pos_tokens(tagged, pos):
+    """Extract particular part-of-speech tokens
+
+    Parameters
+    ----------
+    tagged : list
+        (token, tag) tuples
+    pos : str
+        A valid part-of-speech tag
+
+    Returns
+    -------
+    list
+
+    Notes
+    -----
+    The available tags are:
+        ADJ, ADP, ADV, AUX, CONJ, DET, INTJ, NOUN, NUM, PART,
+        PRON, PROPN, PUNCT, SCONJ, SYM, VERB, X, EOL, SPACE
+    Source: https://spacy.io/docs#token-postags
+    """
+    return [t for t, p in tagged if p == pos]
+
 def _pos_freq(doc):
     """Part of speech frequencies for individual documents
     
     Parameters
     -----------
     doc : str
-        A document with multiple sentences
+        A document with tokens to tag
         
     Returns
     -------
     pos : dict
+        With counts by tag
     """
-    text = nlp(doc)
     pos = defaultdict(float)
-    for sent in text.sents:
-        for token in sent:
-            pos[token.pos_] += 1
+    for _, p in tagger(doc):
+        pos[p] += 1
     return pos
 
 def pos_df(corpus):
