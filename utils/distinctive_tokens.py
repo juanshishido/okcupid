@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def log_odds_ratio(counts, feature_names=None, symmetric_alpha=1, use_variance=False):
+def log_odds_ratio(counts, feature_names=None, symmetric_alpha=1, use_variance=True):
     """
     Parameters
     ----------
@@ -13,7 +13,7 @@ def log_odds_ratio(counts, feature_names=None, symmetric_alpha=1, use_variance=F
         the token names with length `n_features`
     symmetric_alpha : int
         constant
-    use_variance : bool
+    use_variance : bool, default True
         whether to account for variance
     
     Returns
