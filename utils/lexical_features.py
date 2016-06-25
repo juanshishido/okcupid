@@ -236,7 +236,7 @@ def _contains_n(words, corpus):
     np.ndarray
         Number of tokens by document
     """
-    X = _multinomial(corpus, words)
+    X, _ = _multinomial(corpus, {'vocabulary' : words})
     return X.toarray().sum(axis=1)
 
 def contains(words, corpus):
