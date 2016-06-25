@@ -2,6 +2,7 @@ from collections import defaultdict
 import re
 from string import punctuation
 
+import nltk
 import pandas as pd
 from spacy.en import English
 
@@ -259,3 +260,61 @@ def contains(words, corpus):
     n_words = _contains_n(words, corpus)
     n_words[n_words > 0] = 1
     return n_words
+
+def _token_counts(a, b, pos):
+    """Create a DataFrame of `pos` token frequencies for particular
+    demographic splits. `a` and `b` are lists of token, part-of-speech
+    tuples (output from `tag_corpus()`).
+
+    Parameters
+    ----------
+    a : list
+        token, pos tuples
+    b : list
+        token, pos tuples
+    pos : str
+        A valid part-of-speech tag
+
+    Returns
+    -------
+    df : pd.DataFrame
+        With row 0 corresponding to `a` and row 1 to `b`
+    """
+    pos_a = nltk.FreqDist(pos_tokens(a, pos))
+    pos_b = nltk.FreqDist(pos_tokens(b, pos))
+    df_a = pd.DataFrame(pos_a, index=[0])
+    df_b = pd.DataFrame(pos_b, index=[0])
+    df = pd.concat([df_a, df_b], ignore_index=True)
+    df.fillna(0, inplace=True)
+    return df
+
+def print_terms(df, n):
+    measure = df.columns[0]
+    print(" | ".join(df.sort_values(measure, ascending=False)[:n].index))
+    print()
+    print(" | ".join(df.sort_values(measure)[:n].index))
+
+def top_terms(a, b, pos, fn, n):
+    """Print the top `n` tokens (resulting from `fn`) for
+    demographic splits associated with `a` and `b`
+
+    Parameters
+    ----------
+    a : list
+        token, pos tuples
+    b : list
+        token, pos tuples
+    pos : str
+        A valid part-of-speech tag
+    fn : callable
+        Either `diff_prop` of `log_odds_ratio`
+    n : int
+        Number of terms to print for each demographic split
+
+    Returns
+    -------
+    None
+    """
+    df = _token_counts(a, b, pos)
+    df = fn(df.values, df.columns.tolist())
+    print_terms(df, n)
