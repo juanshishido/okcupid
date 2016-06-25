@@ -32,42 +32,30 @@ def _levels(demographics, d_levels=None, print_levels=False):
         print('Levels (in order):', levels, end='\n\n')
     return levels
 
-def corpus_vocab(corpus):
-    """Corpus vocabulary (tokens) based on spaCy tokenizer
+def _multinomial(corpus, kwargs):
+    """Tokens counts by document using the spaCy tokenizer
 
     Parameters
     ----------
     corpus : array-like
         A collection of documents
-
-    Returns
-    -------
-    list
-    """
-    assert isinstance(corpus, (list, pd.Series))
-    cv = CountVectorizer(tokenizer=spacy_tokenize)
-    _ = cv.fit_transform(corpus)
-    return cv.get_feature_names()
-
-def _multinomial(corpus, vocabulary=None):
-    """Tokens counts by document using the spaCy tokenizer
-
-    Parameters
-    ----------
-    corpus : array-list
-        A collection of documents
-    vocabulary : list, default None
-        Tokens to consider
+    kwargs : dict or None
+        Keyword arguments of variable length
 
     Returns
     -------
     X : scipy.sparse.csr.csr_matrix
-        shape (n_samples, n_features)
+        The multinomial representation shape (n_samples, n_features)
+    v : list
+        Vocabulary
     """
-    assert isinstance(corpus, (list, pd.Series))
-    cv = CountVectorizer(tokenizer=spacy_tokenize, vocabulary=vocabulary)
+    if kwargs:
+        cv = CountVectorizer(tokenizer=spacy_tokenize, **kwargs)
+    else:
+        cv = CountVectorizer(tokenizer=spacy_tokenize)
     X = cv.fit_transform(corpus)
-    return X
+    v = cv.get_feature_names()
+    return X, v
 
 def _tfidf(X):
     """tf-idf representation of a count matrix
@@ -85,6 +73,32 @@ def _tfidf(X):
     tt = TfidfTransformer()
     X_ = tt.fit_transform(X)
     return X_
+
+def feature_vectors(corpus, kwargs=None):
+    """Multinomial and TF-IDF representations
+
+    Paramaters
+    ----------
+    corpus : array-like
+        A collection of documents
+    kwargs : dict, default None
+        Keyword arguments of variable length
+        See sklearn.feature_extraction.text.CountVectorizer
+        for accepted keyword arguments
+
+    Returns
+    -------
+    count : scipy.sparse.csr.csr_matrix
+        The multinomial representation shape (n_samples, n_features)
+    tfidf : scipy.sparse.csr.csr_matrix
+        The tf-idf representation
+    vocab : list
+        Vocabulary
+    """
+    assert isinstance(corpus, (list, pd.Series))
+    count, vocab = _multinomial(corpus, kwargs)
+    tfidf = _tfidf(count)
+    return count, tfidf, vocab
 
 def tfidf_matrices(corpus, demographics, vocabulary=None):
     """For creating tfidf matrices of:
@@ -116,7 +130,7 @@ def tfidf_matrices(corpus, demographics, vocabulary=None):
     assert (isinstance(corpus, pd.Series) and
             isinstance(demographics, pd.Series))
     assert corpus.shape[0] == demographics.shape[0]
-    doc_level = _multinomial(corpus, vocabulary=vocabulary)
+    doc_level, _ = _multinomial(corpus, vocabulary=vocabulary)
     levels = _levels(demographics)
     splits = []
     for level in levels:
