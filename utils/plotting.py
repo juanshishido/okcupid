@@ -4,6 +4,8 @@ import seaborn as sns
 from wordcloud import WordCloud
 
 
+mpl.rc('savefig', dpi=200)
+
 def wcloud(wf, color, save_as=None):
     """Create a word cloud based on word frequencies,
     `wf`, using a color function from `wc_colors.py`
@@ -94,3 +96,51 @@ def lollipop(df, demographic, colors):
     ax.yaxis.label.set_color(text_color)
     ax.yaxis.label.set_fontweight(weight)
     ax.yaxis.label.set_fontsize(fs)
+
+def lollipop_paper(df, demographic, colors=['LightGray', 'Black'], topic_labels=None):
+    """Create the lollipop plots for the percentage of users in each NMF group
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Should be created using `group_pct()` in `utils/splits.py`
+    demographic : str
+        Valid column name
+    colors : list
+        Valid Matplotlib colors codes or names (e.g., hex)
+    topic_labels : list, default None
+        x-axis labels
+
+    Returns
+    -------
+    None
+    """
+    # plot
+    fig, ax = plt.subplots(figsize=(12, 8))
+    # lines
+    lineval = df.groupby('group')['pct'].max()
+    for i, g in enumerate(lineval):
+        plt.plot([i, i], [0, g], linewidth=1,
+                 color='Gray', zorder=1, alpha=0.5)
+    # markers
+    for i, d in enumerate(df[demographic].unique()):
+        tdf = df[df[demographic]==d]
+        plt.scatter(range(len(tdf)), tdf.pct,
+                    s=100, color=colors[i], edgecolor='None',
+                    lw=1, zorder=2, label=d.capitalize())
+    # plot options
+    plt.xlim(-0.5, len(tdf)-0.5)
+    plt.ylim(0)
+    plt.ylabel('Users in Each Cluster', fontsize=12)
+    plt.gca().get_yaxis().set_major_formatter(
+        mpl.ticker.FuncFormatter(lambda y, p: format(y, '.0%')))
+    plt.tick_params(top='off', bottom='off', left='off', right='off')
+    ax.spines['top'].set_visible(False)
+    ax.spines['bottom'].set_color('DimGray')
+    ax.spines['left'].set_color('DimGray')
+    ax.spines['right'].set_visible(False)
+    plt.legend(loc='upper center', bbox_to_anchor=(0., 1.02, 1., .102),
+               title=demographic.title(), frameon=False,
+               ncol=3, scatterpoints=1)
+    if topic_labels:
+        plt.xticks(range(len(topic_labels)), topic_labels, rotation='vertical')
