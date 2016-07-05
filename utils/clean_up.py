@@ -23,7 +23,8 @@ def clean_up(input_df, col_names, min_words=5):
                      .apply(lambda x: re.sub('[-]{2,}', ' - ', x))\
                      .apply(lambda x: re.sub('\s+', ' ', x).strip())
         token_count = df[c].str.split().str.len() 
-        df = df[token_count > min_words] #drop rows where current essay has < min_words
+        if min_words > 0:
+            df = df[token_count > min_words] #drop rows where current essay has < min_words
         df.fillna('', inplace=True)
         dfs.append(df)
     if len(col_names) == 1:
